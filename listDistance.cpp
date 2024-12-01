@@ -13,6 +13,8 @@ void sortVector(std::vector<int>& vec) {
 }
 int intrinsicDiff(int* data1, int* data2) {
     int sum=0;
+    int temp[4] = {0,0,0,0};
+    __m128i sumi ;
     for (size_t i=0; i + 4 <= 1000; i += 4) {
         __m128i v1 = _mm_load_si128(reinterpret_cast<const __m128i*>(&data1[i]));  // Load 4 ints
         __m128i v2 = _mm_load_si128(reinterpret_cast<const __m128i*>(&data2[i]));  // Load 4 ints
@@ -21,13 +23,13 @@ int intrinsicDiff(int* data1, int* data2) {
 
         
         diff = _mm_abs_epi32(diff);  // absolute difference
-
+        sumi = _mm_add_epi32(sumi, diff);
         // Horizontal sum (SIMD)
-        int temp[4];
-        _mm_store_si128(reinterpret_cast<__m128i*>(temp), diff);
-
-        sum += temp[0] + temp[1] + temp[2] + temp[3];
+        
     }
+    _mm_store_si128(reinterpret_cast<__m128i*>(temp), sumi);
+
+    sum += temp[0] + temp[1] + temp[2] + temp[3];
     return sum;
 }
 int seqDiff(int* data1, int* data2) {
